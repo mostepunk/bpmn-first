@@ -203,12 +203,12 @@ http://localhost:8000/
 
 ### Makefile Commands
 
-| Command | Description |
-|---------|-------------|
-| `make run` | Start server (creates venv if missing, port 8000) |
-| `make run PORT=9000` | Start server on custom port |
-| `make setup` | Force recreate venv and reinstall dependencies |
-| `make clean` | Remove venv |
+| Command              | Description                                       |
+|----------------------|---------------------------------------------------|
+| `make run`           | Start server (creates venv if missing, port 8000) |
+| `make run PORT=9000` | Start server on custom port                       |
+| `make setup`         | Force recreate venv and reinstall dependencies    |
+| `make clean`         | Remove venv                                       |
 
 ---
 
