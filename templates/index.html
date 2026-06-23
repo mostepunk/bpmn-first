@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpiffyDuck BPMN</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { color: #333; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .workflow-list { margin-top: 20px; }
+        .workflow-item { padding: 10px; border: 1px solid #ddd; margin-bottom: 10px; border-radius: 4px; }
+        .workflow-item a { color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>SpiffyDuck BPMN</h1>
+    <p>Управление бизнес-процессами через BPMN-схемы</p>
+
+    <form action="/start" method="post">
+        <button type="submit" class="btn">Создать новый процесс (заказ утки)</button>
+    </form>
+
+    <div class="workflow-list">
+        <h2>Активные процессы</h2>
+        {% if workflows %}
+            {% for wid, wf in workflows.items() %}
+            <div class="workflow-item">
+                <a href="/workflow/{{ wid }}">Процесс {{ wid }}</a>
+                {% if wf.is_completed() %}
+                    — <span style="color: green;">завершен</span>
+                {% else %}
+                    — <span style="color: orange;">в процессе</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>Нет активных процессов</p>
+        {% endif %}
+    </div>
+</body>
+</html>

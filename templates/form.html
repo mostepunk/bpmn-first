@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ task_name }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input[type="text"], input[type="number"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .radio-group { display: flex; gap: 15px; margin-top: 5px; }
+        .radio-group label { font-weight: normal; }
+    </style>
+</head>
+<body>
+    <h1>{{ task_name }}</h1>
+
+    <form action="/workflow/{{ workflow_id }}/task/{{ task_id }}/complete" method="post">
+        {% for field in fields %}
+        <div class="form-group">
+            <label for="{{ field.id }}">{{ field.label }}</label>
+
+            {% if field.type == "enum" %}
+                <select name="{{ field.id }}" id="{{ field.id }}" required>
+                    {% for opt in field.options %}
+                    <option value="{{ opt.id }}">{{ opt.name }}</option>
+                    {% endfor %}
+                </select>
+
+            {% elif field.type == "boolean" %}
+                <div class="radio-group">
+                    <label><input type="radio" name="{{ field.id }}" value="true" required> Да</label>
+                    <label><input type="radio" name="{{ field.id }}" value="false" required> Нет</label>
+                </div>
+
+            {% elif field.type == "number" %}
+                <input type="number" name="{{ field.id }}" id="{{ field.id }}" required>
+
+            {% else %}
+                <input type="text" name="{{ field.id }}" id="{{ field.id }}" required>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn">Продолжить</button>
+    </form>
+</body>
+</html>

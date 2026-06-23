@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1ntgj7m" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.10.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions 
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" 
+    xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:modeler="http://camunda.org/schema/modeler/1.0" 
+    id="Definitions_1ntgj7m" 
+    targetNamespace="http://bpmn.io/schema/bpmn" 
+    exporter="Camunda Modeler" 
+    exporterVersion="4.10.0" 
+    modeler:executionPlatform="Camunda Platform" 
+    modeler:executionPlatformVersion="7.15.0">
   <bpmn:process id="duck_process" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_1">
-      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+
+    <!-- Начало процесса -->
+    <bpmn:startEvent id="start">
+      <bpmn:outgoing>flow_start_to_interview</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="interview_client" />
-    <bpmn:sequenceFlow id="Flow_2" sourceRef="interview_client" targetRef="Activity_1jz3ih0" />
-    <bpmn:endEvent id="Event_0fj8eo7">
-      <bpmn:incoming>Flow_4</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_4" sourceRef="Activity_0fmjk85" targetRef="Event_0fj8eo7" />
+
+    <!-- Переход: начало → интервью -->
+    <bpmn:sequenceFlow id="flow_start_to_interview" sourceRef="start" targetRef="interview_client" />
+
+    <!-- Задача: опрос клиента (ручная, с формой) -->
     <bpmn:userTask id="interview_client" name="Interview Client" camunda:formKey="duck_application">
       <bpmn:extensionElements>
         <camunda:formData>
@@ -20,69 +34,104 @@
             <camunda:value id="Dead" name="Dead ducks" />
           </camunda:formField>
           <camunda:formField id="tolerant" label="I don&#39;t mind finding feathers and eggs in my home." type="boolean" />
+          <camunda:formField id="quantity" label="How many ducks do you want?" type="long" />
         </camunda:formData>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1</bpmn:incoming>
-      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+      <bpmn:incoming>flow_start_to_interview</bpmn:incoming>
+      <bpmn:outgoing>flow_interview_to_determine</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:scriptTask id="Activity_0fmjk85" name="Deliver&#10;real Duck">
-      <bpmn:incoming>Flow_06xo1t0</bpmn:incoming>
-      <bpmn:outgoing>Flow_4</bpmn:outgoing>
-      <bpmn:script>print("Delivering a Real Duck!")</bpmn:script>
-    </bpmn:scriptTask>
-    <bpmn:exclusiveGateway id="Gateway_0vqsmxy" name="will real duck be&#10; safe?">
-      <bpmn:incoming>Flow_1olpa6l</bpmn:incoming>
-      <bpmn:outgoing>Flow_06xo1t0</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0wkvu0e</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_06xo1t0" name="is_safe == True" sourceRef="Gateway_0vqsmxy" targetRef="Activity_0fmjk85">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">is_safe == True</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0wkvu0e" name="is_safe == False" sourceRef="Gateway_0vqsmxy" targetRef="Activity_0mwove7">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">is_safe == False</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:endEvent id="Event_1pkdfjl">
-      <bpmn:incoming>Flow_0wmf1w5</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0wmf1w5" sourceRef="Activity_0mwove7" targetRef="Event_1pkdfjl" />
-    <bpmn:sequenceFlow id="Flow_1olpa6l" sourceRef="Activity_1jz3ih0" targetRef="Gateway_0vqsmxy" />
-    <bpmn:scriptTask id="Activity_1jz3ih0" name="Determine Duck Worthiness">
-      <bpmn:incoming>Flow_2</bpmn:incoming>
-      <bpmn:outgoing>Flow_1olpa6l</bpmn:outgoing>
-      <bpmn:script>if not tolerant or variety == 'Dead':
+
+    <!-- Переход: интервью → определение пригодности -->
+    <bpmn:sequenceFlow id="flow_interview_to_determine" sourceRef="interview_client" targetRef="determine_worthiness" />
+
+    <!-- Задача: определить, можно ли доставить настоящую утку (автоматическая, скрипт) -->
+    <bpmn:scriptTask id="determine_worthiness" name="Determine Duck Worthiness">
+      <bpmn:incoming>flow_interview_to_determine</bpmn:incoming>
+      <bpmn:outgoing>flow_determine_to_check</bpmn:outgoing>
+      <bpmn:script>if not tolerant or variety == 'Dead' or quantity > 5:
     is_safe = False
 else:
     is_safe = True
 </bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:scriptTask id="Activity_0mwove7" name="Deliver Decoy Duck">
-      <bpmn:incoming>Flow_0wkvu0e</bpmn:incoming>
-      <bpmn:outgoing>Flow_0wmf1w5</bpmn:outgoing>
+
+    <!-- Переход: определение → проверка безопасности -->
+    <bpmn:sequenceFlow id="flow_determine_to_check" sourceRef="determine_worthiness" targetRef="check_safety" />
+
+    <!-- Развилка: безопасно ли доставлять настоящую утку? -->
+    <bpmn:exclusiveGateway id="check_safety" name="will real duck be safe?">
+      <bpmn:incoming>flow_determine_to_check</bpmn:incoming>
+      <bpmn:outgoing>flow_safe_to_real</bpmn:outgoing>
+      <bpmn:outgoing>flow_unsafe_to_decoy</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Переход: безопасно → доставка настоящей утки -->
+    <bpmn:sequenceFlow id="flow_safe_to_real" name="is_safe == True" sourceRef="check_safety" targetRef="deliver_real_duck">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">is_safe == True</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <!-- Переход: небезопасно → доставка муляжа -->
+    <bpmn:sequenceFlow id="flow_unsafe_to_decoy" name="is_safe == False" sourceRef="check_safety" targetRef="deliver_decoy">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">is_safe == False</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <!-- Задача: доставить настоящую утку (автоматическая) -->
+    <bpmn:scriptTask id="deliver_real_duck" name="Deliver real Duck">
+      <bpmn:incoming>flow_safe_to_real</bpmn:incoming>
+      <bpmn:outgoing>flow_real_to_end</bpmn:outgoing>
+      <bpmn:script>print("Delivering a Real Duck!")</bpmn:script>
+    </bpmn:scriptTask>
+
+    <!-- Переход: доставка настоящей → конец (ветка настоящей) -->
+    <bpmn:sequenceFlow id="flow_real_to_end" sourceRef="deliver_real_duck" targetRef="end_real" />
+
+    <!-- Конец: процесс завершен, настоящая утка доставлена -->
+    <bpmn:endEvent id="end_real">
+      <bpmn:incoming>flow_real_to_end</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Задача: доставить муляж (автоматическая) -->
+    <bpmn:scriptTask id="deliver_decoy" name="Deliver Decoy Duck">
+      <bpmn:incoming>flow_unsafe_to_decoy</bpmn:incoming>
+      <bpmn:outgoing>flow_decoy_to_end</bpmn:outgoing>
       <bpmn:script>print("Just Delivering a Decoy Duck, you can't kill it!")</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:textAnnotation id="TextAnnotation_1183juq">
+
+    <!-- Переход: доставка муляжа → конец (ветка муляжа) -->
+    <bpmn:sequenceFlow id="flow_decoy_to_end" sourceRef="deliver_decoy" targetRef="end_decoy" />
+
+    <!-- Конец: процесс завершен, муляж доставлен -->
+    <bpmn:endEvent id="end_decoy">
+      <bpmn:incoming>flow_decoy_to_end</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Аннотация: пояснение к началу процесса -->
+    <bpmn:textAnnotation id="annotation_receive_request">
       <bpmn:text>Receive Request for Duck</bpmn:text>
     </bpmn:textAnnotation>
-    <bpmn:association id="Association_1ae1me3" sourceRef="StartEvent_1" targetRef="TextAnnotation_1183juq" />
+    <bpmn:association id="association_start_to_annotation" sourceRef="start" targetRef="annotation_receive_request" />
+
   </bpmn:process>
+
+  <!-- Диаграмма (визуальное расположение элементов) -->
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="duck_process">
-      <bpmndi:BPMNShape id="TextAnnotation_1183juq_di" bpmnElement="TextAnnotation_1183juq">
+      <bpmndi:BPMNShape id="annotation_receive_request_di" bpmnElement="annotation_receive_request">
         <dc:Bounds x="250" y="80" width="100" height="54" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_10fi2h2_di" bpmnElement="Flow_4">
+      <bpmndi:BPMNEdge id="flow_real_to_end_di" bpmnElement="flow_real_to_end">
         <di:waypoint x="750" y="150" />
         <di:waypoint x="832" y="150" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_05jq9uf_di" bpmnElement="Flow_2">
+      <bpmndi:BPMNEdge id="flow_interview_to_determine_di" bpmnElement="flow_interview_to_determine">
         <di:waypoint x="330" y="210" />
         <di:waypoint x="370" y="210" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0k4fjav_di" bpmnElement="Flow_1">
+      <bpmndi:BPMNEdge id="flow_start_to_interview_di" bpmnElement="flow_start_to_interview">
         <di:waypoint x="188" y="210" />
         <di:waypoint x="230" y="210" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_06xo1t0_di" bpmnElement="Flow_06xo1t0">
+      <bpmndi:BPMNEdge id="flow_safe_to_real_di" bpmnElement="flow_safe_to_real">
         <di:waypoint x="540" y="185" />
         <di:waypoint x="540" y="150" />
         <di:waypoint x="650" y="150" />
@@ -90,7 +139,7 @@ else:
           <dc:Bounds x="552" y="133" width="77" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0wkvu0e_di" bpmnElement="Flow_0wkvu0e">
+      <bpmndi:BPMNEdge id="flow_unsafe_to_decoy_di" bpmnElement="flow_unsafe_to_decoy">
         <di:waypoint x="540" y="235" />
         <di:waypoint x="540" y="280" />
         <di:waypoint x="650" y="280" />
@@ -98,42 +147,42 @@ else:
           <dc:Bounds x="549" y="283" width="81" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0wmf1w5_di" bpmnElement="Flow_0wmf1w5">
+      <bpmndi:BPMNEdge id="flow_decoy_to_end_di" bpmnElement="flow_decoy_to_end">
         <di:waypoint x="750" y="280" />
         <di:waypoint x="832" y="280" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1olpa6l_di" bpmnElement="Flow_1olpa6l">
+      <bpmndi:BPMNEdge id="flow_determine_to_check_di" bpmnElement="flow_determine_to_check">
         <di:waypoint x="470" y="210" />
         <di:waypoint x="515" y="210" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Gateway_0vqsmxy_di" bpmnElement="Gateway_0vqsmxy" isMarkerVisible="true">
+      <bpmndi:BPMNShape id="check_safety_di" bpmnElement="check_safety" isMarkerVisible="true">
         <dc:Bounds x="515" y="185" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="575" y="196" width="78" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_127rgpv_di" bpmnElement="Activity_0fmjk85">
+      <bpmndi:BPMNShape id="deliver_real_duck_di" bpmnElement="deliver_real_duck">
         <dc:Bounds x="650" y="110" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0fj8eo7_di" bpmnElement="Event_0fj8eo7">
+      <bpmndi:BPMNShape id="end_real_di" bpmnElement="end_real">
         <dc:Bounds x="832" y="132" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
         <dc:Bounds x="152" y="192" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1n58cog_di" bpmnElement="interview_client">
+      <bpmndi:BPMNShape id="interview_client_di" bpmnElement="interview_client">
         <dc:Bounds x="230" y="170" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0i9k91k_di" bpmnElement="Activity_1jz3ih0">
+      <bpmndi:BPMNShape id="determine_worthiness_di" bpmnElement="determine_worthiness">
         <dc:Bounds x="370" y="170" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1jv20eg_di" bpmnElement="Activity_0mwove7">
+      <bpmndi:BPMNShape id="deliver_decoy_di" bpmnElement="deliver_decoy">
         <dc:Bounds x="650" y="240" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1pkdfjl_di" bpmnElement="Event_1pkdfjl">
+      <bpmndi:BPMNShape id="end_decoy_di" bpmnElement="end_decoy">
         <dc:Bounds x="832" y="262" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Association_1ae1me3_di" bpmnElement="Association_1ae1me3">
+      <bpmndi:BPMNEdge id="association_start_to_annotation_di" bpmnElement="association_start_to_annotation">
         <di:waypoint x="184" y="199" />
         <di:waypoint x="262" y="134" />
       </bpmndi:BPMNEdge>

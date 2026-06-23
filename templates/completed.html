@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Процесс завершен</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .success { color: green; font-size: 1.2em; }
+        .data { background: #f5f5f5; padding: 15px; border-radius: 4px; margin-top: 20px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Процесс завершен!</h1>
+    <p class="success">✓ BPMN-процесс успешно выполнен</p>
+
+    <div class="data">
+        <h3>Результат:</h3>
+        <p style="font-size: 1.1em; color: #333;">
+            {% if data.is_safe %}
+                <span style="color: green;">✓ Настоящая утка</span> — доставляем живую утку!
+            {% else %}
+                <span style="color: orange;">⚠ Муляж</span> — доставляем резиновую утку
+            {% endif %}
+        </p>
+        <h3>Данные процесса:</h3>
+        <pre>{{ data | tojson(indent=2) }}</pre>
+    </div>
+
+    <p style="margin-top: 20px;">
+        <a href="/" class="btn">На главную</a>
+    </p>
+</body>
+</html>
