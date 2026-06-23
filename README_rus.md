@@ -166,6 +166,22 @@ bpmn-first/
 
 ## Как запустить
 
+### Быстрый старт (через Make)
+
+```bash
+# Клонировать
+git clone https://github.com/mostepunk/bpmn-first.git
+cd bpmn-first
+
+# Запустить сервер (автоматически создаст venv и установит зависимости при первом запуске)
+make run
+
+# Или указать свой порт
+make run PORT=9000
+```
+
+### Ручная настройка
+
 ```bash
 # Клонировать
 git clone https://github.com/mostepunk/bpmn-first.git
@@ -184,6 +200,15 @@ uvicorn app:app --host 0.0.0.0 --port 8000
 # Открыть в браузере
 http://localhost:8000/
 ```
+
+### Команды Makefile
+
+| Команда | Описание |
+|---------|----------|
+| `make run` | Запустить сервер (создаёт venv если нет, порт 8000) |
+| `make run PORT=9000` | Запустить на другом порту |
+| `make setup` | Пересоздать venv и переустановить зависимости |
+| `make clean` | Удалить venv |
 
 ---
 
