@@ -41,12 +41,12 @@ The script determined: if not tolerant or Dead selected → `is_safe = False` (d
 
 The original code was written for an older version of SpiffWorkflow. Running on the current version produced errors:
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `ModuleNotFoundError: SpiffWorkflow.camunda.specs.UserTask` | Module renamed to `user_task` (lowercase) | `from SpiffWorkflow.camunda.specs.user_task import ...` |
-| `AttributeError: 'BpmnWorkflow' object has no attribute 'get_ready_user_tasks'` | API changed | `workflow.get_tasks(state=TaskState.READY, spec_class=UserTask)` |
-| `AttributeError: 'BpmnWorkflow' object has no attribute 'complete_task_from_id'` | Method moved to Task | `task.complete()` |
-| `AttributeError: 'Task' object has no attribute 'update_data_var'` | Method removed | `task.data[field.id] = answer` |
+| Error                                                                            | Cause                                     | Fix                                                              |
+|----------------------------------------------------------------------------------|-------------------------------------------|------------------------------------------------------------------|
+| `ModuleNotFoundError: SpiffWorkflow.camunda.specs.UserTask`                      | Module renamed to `user_task` (lowercase) | `from SpiffWorkflow.camunda.specs.user_task import ...`          |
+| `AttributeError: 'BpmnWorkflow' object has no attribute 'get_ready_user_tasks'`  | API changed                               | `workflow.get_tasks(state=TaskState.READY, spec_class=UserTask)` |
+| `AttributeError: 'BpmnWorkflow' object has no attribute 'complete_task_from_id'` | Method moved to Task                      | `task.complete()`                                                |
+| `AttributeError: 'Task' object has no attribute 'update_data_var'`               | Method removed                            | `task.data[field.id] = answer`                                   |
 
 Also added `if __name__ == "__main__":` for module import capability.
 
@@ -60,12 +60,12 @@ Instead of console `input()`, a full web server was created:
 
 #### Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Home: process list + "Create" button |
-| `/start` | POST | Creates new workflow instance |
-| `/workflow/{id}` | GET | Shows form or result |
-| `/workflow/{id}/task/{task_id}/complete` | POST | Accepts form data, continues workflow |
+| Endpoint                                 | Method | Description                           |
+|------------------------------------------|--------|---------------------------------------|
+| `/`                                      | GET    | Home: process list + "Create" button  |
+| `/start`                                 | POST   | Creates new workflow instance         |
+| `/workflow/{id}`                         | GET    | Shows form or result                  |
+| `/workflow/{id}/task/{task_id}/complete` | POST   | Accepts form data, continues workflow |
 
 #### Web Interface Flow
 
@@ -95,23 +95,23 @@ Original IDs were auto-generated (e.g., `Activity_0fmjk85`, `Flow_06xo1t0`). The
 
 All elements renamed:
 
-| Old ID | New ID | Type |
-|--------|--------|------|
-| `StartEvent_1` | `start` | startEvent |
-| `Flow_1` | `flow_start_to_interview` | sequenceFlow |
-| `interview_client` | `interview_client` | userTask (unchanged) |
-| `Flow_2` | `flow_interview_to_determine` | sequenceFlow |
-| `Activity_1jz3ih0` | `determine_worthiness` | scriptTask |
-| `Flow_1olpa6l` | `flow_determine_to_check` | sequenceFlow |
-| `Gateway_0vqsmxy` | `check_safety` | exclusiveGateway |
-| `Flow_06xo1t0` | `flow_safe_to_real` | sequenceFlow |
-| `Flow_0wkvu0e` | `flow_unsafe_to_decoy` | sequenceFlow |
-| `Activity_0fmjk85` | `deliver_real_duck` | scriptTask |
-| `Flow_4` | `flow_real_to_end` | sequenceFlow |
-| `Event_0fj8eo7` | `end_real` | endEvent |
-| `Activity_0mwove7` | `deliver_decoy` | scriptTask |
-| `Flow_0wmf1w5` | `flow_decoy_to_end` | sequenceFlow |
-| `Event_1pkdfjl` | `end_decoy` | endEvent |
+| Old ID             | New ID                        | Type                 |
+|--------------------|-------------------------------|----------------------|
+| `StartEvent_1`     | `start`                       | startEvent           |
+| `Flow_1`           | `flow_start_to_interview`     | sequenceFlow         |
+| `interview_client` | `interview_client`            | userTask (unchanged) |
+| `Flow_2`           | `flow_interview_to_determine` | sequenceFlow         |
+| `Activity_1jz3ih0` | `determine_worthiness`        | scriptTask           |
+| `Flow_1olpa6l`     | `flow_determine_to_check`     | sequenceFlow         |
+| `Gateway_0vqsmxy`  | `check_safety`                | exclusiveGateway     |
+| `Flow_06xo1t0`     | `flow_safe_to_real`           | sequenceFlow         |
+| `Flow_0wkvu0e`     | `flow_unsafe_to_decoy`        | sequenceFlow         |
+| `Activity_0fmjk85` | `deliver_real_duck`           | scriptTask           |
+| `Flow_4`           | `flow_real_to_end`            | sequenceFlow         |
+| `Event_0fj8eo7`    | `end_real`                    | endEvent             |
+| `Activity_0mwove7` | `deliver_decoy`               | scriptTask           |
+| `Flow_0wmf1w5`     | `flow_decoy_to_end`           | sequenceFlow         |
+| `Event_1pkdfjl`    | `end_decoy`                   | endEvent             |
 
 Now the schema can be read as text: `start → flow_start_to_interview → interview_client → ...`
 
@@ -188,15 +188,10 @@ http://localhost:8000/
 ---
 
 ## Key Takeaways
-
 1. **BPMN-first works:** a business analyst can change logic by editing only the schema. Code adapts automatically.
-
 2. **Human-readable IDs matter:** with meaningful names, the schema becomes documentation. No need to open an editor to understand the flow.
-
 3. **Web interface is essential:** console `input()` is demo-only. Real users work through a browser.
-
 4. **Data typing:** BPMN forms contain types (enum, boolean, long). The server must cast HTTP strings to correct Python types.
-
 5. **Workflow state:** in the demo stored in memory. For production, serialization to a database is needed (via `workflow.serialize()`).
 
 ---
